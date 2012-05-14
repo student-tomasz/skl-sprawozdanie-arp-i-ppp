@@ -43,6 +43,10 @@ prekonfigurowane podczas podnoszenia systemu operacyjnego. Sieć
 \arp. Na obu maszynach ręcznie skonfigurowano interfejsy, oraz upewniono się, że
 pamięć podręczna \texttt{arp} jest pusta.
 
+Można zauważyć, że w przeciwieństwie do wpisów dla adresów innych maszyn, adresy
+przypisane do interfejsów bieżącej maszyny są zapamiętywane bez limitu
+czasowego.
+
 \begin{lstlisting}
 so5501b% sudo ifconfig vr2 10.0.0.10/24
 so5501b% sudo arp -d -i vr2 -a
@@ -73,6 +77,14 @@ listening on sis1, link-type EN10MB (Ethernet), capture size 65535 bytes
 17:13:16.148178 ARP, Reply 10.0.0.11 is-at SO4801B, length 28
 \end{lstlisting}
 
-W listingu widoczne są dwie wymiany \texttt{Request/Reply}. Pierwsza z maszyny
-\tjz{} szukającej maszyny \tjj{}, by wysłać zapytanie z \texttt{ping}. Druga
-wymiana, jest z maszyny \tjj{}, by móc odpowiedzieć na \texttt{ping}.
+W listingu widoczne są dwie wymiany \texttt{Request/Reply}. Pierwsza pochodzi z
+maszyny \tjz{} szukającej maszyny \tjj{}, by wysłać zapytanie z \texttt{ping}.
+Druga wymiana jest z maszyny \tjj{}, by móc odpowiedzieć na \texttt{ping}. Efekt
+wymian jest widoczny w tablicy pamięci podręcznej \texttt{arp}, jako ostatni
+wpis o ograniczonym czasie życia.
+
+\begin{lstlisting}
+so4801% arp -i sis1 -a
+? (10.0.0.11) at SO4801B on sis1 permanent [ethernet]
+? (10.0.0.10) at SO5501B2 on sis1 expires in 1147 seconds [ethernet]
+\end{lstlisting}
