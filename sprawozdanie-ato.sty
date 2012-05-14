@@ -1,0 +1,64 @@
+\ProvidesPackage{sprawozdanie-ato}
+
+\usepackage[paper=a4paper,hmargin=3cm,vmargin=4cm]{geometry}
+
+\usepackage{polski}
+\usepackage{indentfirst}
+\usepackage{xltxtra}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+
+\defaultfontfeatures{Mapping=tex-text}
+\setromanfont{Charis SIL}
+\setmonofont[Scale=MatchLowercase]{Inconsolata}
+%\setsansfont[Scale=MatchLowercase]{Helvetica Neue}
+\onehalfspacing
+
+\definecolor{dkgreen}{rgb}{0.2,0.8,0.2}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{
+  aboveskip=11pt,
+  belowskip=5.5pt,
+  basicstyle=\ttfamily\footnotesize,
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  %firstnumber=1,
+  %stepnumber=5,
+  %numbersep=5pt,
+  tabsize=2,
+  %breaklines=true,
+  breaklines=false,
+  breakatwhitespace=false,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=tb,
+  captionpos=b,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{mauve},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve}
+}
+
+\hypersetup{
+  unicode=true
+}
+
+\newcommand{\bsd}{FreeBSD}
+\newcommand{\eth}{Ethernet}
+\newcommand{\wifi}{Wi\dywiz Fi}
+\newcommand{\rs}{RS\dywiz 232}
+
+\newcommand{\tcp}{TCP/IP}
+\newcommand{\arp}{ARP}
+\newcommand{\ppp}{PPP}
+\newcommand{\pppoe}{PPPoE}
+
+\newcommand{\kjz}{\texttt{\textbf{k10}}}
+\newcommand{\kjj}{\texttt{\textbf{k11}}}
+\newcommand{\tjz}{\texttt{\textbf{so5501b}}}
+\newcommand{\tjj}{\texttt{\textbf{so4801}}}
+\newcommand{\volt}{\texttt{\textbf{volt}}}
