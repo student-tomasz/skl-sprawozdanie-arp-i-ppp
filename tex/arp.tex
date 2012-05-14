@@ -11,13 +11,13 @@ operacyjnych protokół obsługiwany jest przeważnie przez program \texttt{arp}
 Gdy adres fizyczny maszyny\dywiz adresata jest nieznany, wysyłane jest zapytanie
 \arp. Jest to ramka \eth{} zawierająca adres IP adresata. Ramka jest prośbą o
 odpowiedź od maszyny, która ma przypisany dany adres IP
-\cite{arp:stevens_arp_przyklad}. Zapytanie jest wysyłanie jako \emph{broadcast}
+\cite{arp:stevens-przyklad}. Zapytanie jest wysyłanie jako \emph{broadcast}
 na warstwie łącza aktualnej podsieci.
 
 Dla polepszenia wydajności zarządzania połączeniami, program \texttt{arp}
 przechowuje w pamięci podręcznej tablicę mapującą adresy logicznie na adresy
 fizyczne. Wpis jest uznawany za poprawny przez okres 20 minut, następnie zostaje
-odświeżony \cite{arp:stevens_arp_cache}.
+odświeżony \cite{arp:stevens-cache}.
 
 W sieciach IPv6 funkcjonalność \arp{} spełnia protokół NDP -- \emph{Neighbor
 Discovery Protocol}. W połączeniach \ppp{} i innych połączeniach point-to-point
