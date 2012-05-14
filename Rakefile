@@ -1,6 +1,7 @@
 $document = 'sprawozdanie-arp-i-ppp.pdf'
 $dependencies = [
   'sprawozdanie-ato.sty',
+  'tex/arp.tex',
   'tex/bibliografia.tex',
 ]
 $byproducts = %w{*.out *.log *.aux *.toc}
