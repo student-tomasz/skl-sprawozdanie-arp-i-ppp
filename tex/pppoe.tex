@@ -1,0 +1,140 @@
+\subsection{\ppp}
+\subsubsection{Wstęp}
+\ppp (Point-to-Point Protocol) to rozwiązanie służące do przenoszenia datagramów IP.
+Najczęściej jest stosowany do tworzenia połączeń opartych na połączeniach szeregowych (takich jak modemy, łącza optyczne)\cite{ppp:stevens-ppp}.
+
+W przeciwieństwie do \arp{} \ppp{} należy traktować raczej jako zbiór protokołów.
+Protokoły te pozwalają między innymi na utworzenie połączenia \ppp (LCP), i konfiguracje połączenia, które będzie korzystać z połączenia \ppp (NCP) -- np. połączenia IP.
+
+Zakresem działania \textbf{LCP} (\emph{Link Control Protocols}) jest samo zestawienie połączenia pomiędzy dwoma urządzeniami.
+Wymagania wobec samego połączenia są minimalne w stosunku do innych protokołów, wystarczy że wspiera komunikację dwukierunkową.
+
+Zwykle samo \ppp nie koncentruje się na zapewnieniu niezawodności połączenia i retransmisji danych, choć istnieją standardy i protokoły, które mogą rozwiązywać problemy z niezawodnością sieci w ramach \ppp{}.
+To zadanie jest delegowane do protokółu, który działa wewnątrz połączenia \ppp{}, np. \ip{}.
+
+Poza tym istnieją też protokoły i rozszerzenia \ppp{} wspierające szyfrowanie, kompresję i raportowanie stanu połączenia.
+
+Ponieważ nasza stacja robocza na laboratorium nie była wyposażona w modem, w ramach ćwiczenia \ppp{} wykonaliśmy połączenie \tcp{} poprzez \pppoe{}.
+
+Zwykle połączenia tego typu stosowane są do połączenia z modemem lub podobnym urządzeniem poprzez sieć LAN lub WAN \cite{ppp:stevens-pppoe} (ostatecznie na łączu ethernetowym można zestawić połączenie \tcp{} nie korzystając z \ppp{}).
+
+\subsubsection{Przygotowanie ćwiczenia}
+
+Konfiguracja sprzętowa połączenia przedstawiała się następująco:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=11cm]{figury/ppp/schemat-przed.pdf}
+  \caption{Schemat sieci - połączenie PPP.}
+  \label{fig:ppp:schemat-sieci-przed}
+\end{figure}
+
+\pppcli{} i \pppserv{} połączyliśmy skrosowanym kablem.
+
+Zaczęliśmy od zdekonfigurowania interfejsów \emph{sis2} i \emph{fxp0}.
+Następnie podnieśliśmy te interfejsy.
+
+Maszyna \pppserv{} pełniła rolę serwera PPP, a maszyna \pppcli{} - klienta PPP.
+Na maszynie \pppcli{} skonfigurowaliśmy połączenie w taki sposób, aby wynegocjowane zostało następujące połączenie \tcp{}:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=11cm]{figury/ppp/schemat-po.pdf}
+  \caption{Schemat sieci tunelowanej przez \ppp{}.}
+  \label{fig:ppp:schemat-sieci-przed}
+\end{figure}
+
+\subsubsection{Wykonanie ćwiczenia}
+Skonfigurowaliśmy klienta PPP na maszynie \pppcli{} w następujący sposób\footnote{/etc/ppp/ppp.conf}:
+
+\begin{lstlisting}
+default:
+
+  # logowanie
+
+  set log Phase tun command
+
+polaczenie:
+
+  # docelowa konfiguracja sieci
+
+  set ifaddr 10.0.0.1/0 10.0.0.2/0 
+
+  # urządzenie, z którego należy korzystać (fxp0)
+  # nie udało nam się połączyć bez ':*', które
+  # oznacza, że klient powinien próbować połączenie
+  # z dowolnym providerem
+
+  set device PPPoE:fxp0:* #1
+
+  set authname ppp
+  set authkey ppp
+  set dial
+  set login
+  add default HISADDR
+\end{lstlisting}
+
+Następnie na \pppserv{} uruchomiliśmy proces pppoed:
+
+
+\begin{lstlisting}
+  # service pppoed onestart sis2
+\end{lstlisting}
+
+I na \pppcli{} wykonaliśmy następującą komendę, która zestawiła połączenie:
+
+
+\begin{lstlisting}
+  $ ppp -ddial polaczenie
+\end{lstlisting}
+
+Wynik polecenia \texttt{ifconfig} następnie wskazuje, że mamy zestawione połączenie.
+
+
+\begin{lstlisting}
+tun0: flags=8051<UP,POINTOPOINT,RUNNING,MULTICAST> metric 0 mtu 1492
+        options=80000<LINKSTATE>
+        inet 10.0.0.2 --> 10.0.0.1 netmask 255.255.255.255
+        Opened by PID 27226
+\end{lstlisting}
+
+\subsubsection{Obserwacja połączenia i wnioski}
+Udało nam się zalogować negocjację połączenia przez protokół \texttt{LCP}
+\footnote{maszyna \pppserv{} nazywała się wtedy \texttt{so5501b}}
+:
+
+\begin{lstlisting}
+17:36:01.655628 PPPoE PADI [Host-Uniq 0xC0B9C5C2] [Service-Name "*"]
+17:36:34.096172 PPPoE PADI [Host-Uniq 0x803AD9C2] [Service-Name "*"]
+17:36:34.102227 PPPoE PADO [AC-Name "so5501b"] [Service-Name "*"] 
+    [Host-Uniq 0x803AD9C2] [AC-Cookie 0x400818C3]
+17:36:34.102367 PPPoE PADR [Host-Uniq 0x803AD9C2] 
+    [AC-Cookie 0x400818C3] [AC-Name "so5501b"] [Service-Name "*"]
+17:36:34.102455 PPPoE PADS [ses 0x1] [AC-Name "so5501b"] 
+    [Service-Name "*"] [Host-Uniq 0x803AD9C2] [AC-Cookie 0x400818C3]
+17:36:35.365394 PPPoE [ses 0x1] LCP, Conf-Request (0x01), id 1, length 26
+17:36:35.365863 PPPoE [ses 0x1] LCP, Conf-Request (0x01), id 1, length 26
+17:36:35.365913 PPPoE [ses 0x1] LCP, Conf-Ack (0x02), id 1, length 26
+17:36:35.366971 PPPoE [ses 0x1] LCP, Conf-Ack (0x02), id 1, length 26
+\end{lstlisting}
+
+Jest to zgodne z tym, jak taka negocjacja powinna wyglądać \cite{ppp:stevens-pppoe}:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=5cm]{figury/ppp/padi-pado.pdf}
+  \caption{Negocjacja połączenia \ppp.}
+  \label{fig:ppp:schemat-sieci-przed}
+\end{figure}
+
+Po ustanowieniu sesji widzimy, że protokół LCP zaczyna konfigurować połączenie \tcp{} zgodnie z konfiguracją w pliku \texttt{/etc/ppp/ppp.conf}.
+
+Za pomocą poleceń \texttt{ping} i \texttt{netcat} sprawdziliśmy, że połączenie faktycznie działa.
+\begin{lstlisting}
+17:40:27.658383 PPPoE [ses 0x3] IP so4801c.iem.pw.edu.pl > 10.0.0.1: ICMP echo request, id 61802, seq 0, length 64
+17:40:27.660076 PPPoE [ses 0x3] IP 10.0.0.1 > so4801c.iem.pw.edu.pl: ICMP echo reply, id 61802, seq 0, length 64
+17:40:28.657813 PPPoE [ses 0x3] compressed PPP data
+17:40:28.658171 PPPoE [ses 0x3] compressed PPP data
+\end{lstlisting}
+Widać tutaj, że zestawiliśmy połączenie z kompresją - przynajmniej wg. programu \texttt{tcpdump}.
+Widzimy też, że możemy obserwować pakiety zarówno przed jak i po opakowaniu w ramki PPP (choć \texttt{tcpdump} nie pozwala nam zobaczyć, co dokładnie jest w pakietach przenoszonych przez \texttt{PPP}.

@@ -1,9 +1,11 @@
 $document = 'sprawozdanie-arp-i-ppp.pdf'
+
 $dependencies = [
   'sprawozdanie-ato.sty',
-  'tex/arp.tex',
   'tex/bibliografia.tex',
 ]
+$dependencies += Dir.glob('tex/*tex')
+
 $byproducts = %w{*.out *.log *.aux *.toc}
 
 $lc = 'xelatex'
