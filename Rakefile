@@ -1,17 +1,14 @@
-$document = 'sprawozdanie-arp-i-ppp.pdf'
+require_relative 'util/pdfreader'
+require_relative 'util/ext' #here be monkeypatching
 
-$dependencies = [
-  'sprawozdanie-ato.sty',
-  'tex/bibliografia.tex',
-]
-$dependencies += Dir.glob('tex/*tex')
-
-$byproducts = %w{*.out *.log *.aux *.toc}
+$document = Dir.glob('*.tex').first.ext('pdf')
+$dependencies = [] + Dir.glob('**/*.tex') + Dir.glob('./*sty')
+$byproducts = "*.out *.log *.aux *.toc"
 
 $lc = 'xelatex'
 $lf = '-interaction=nonstopmode'
 
-file $document => [$document.sub('.pdf', '.tex'), *$dependencies] do |t|
+file $document => [$document.ext('tex'), *$dependencies] do |t|
   2.times { sh "#{$lc} #{$lf} #{t.prerequisites[0]} > /dev/null" }
 end
 
@@ -20,15 +17,20 @@ task :default => :build
 task :build => $document
 
 task :show => $document do
-  os = case `uname`.strip when 'Darwin' then :mac else :linux end
-  case os
-  when :mac
-    sh "open #{$document}"
-  else
-    sh "xpdf #{$document} &"
-  end
+  PDFReaderCommand.find.run($document)
 end
 
 task :clean do
-  $byproducts.each { |file| sh "rm -f #{file}" }
+  sh "rm -f #{$byproducts}"
+end
+
+# Wypisuje slowa ktore nie wystepuja w polskim ani angielskim
+# slowniku, kazde slowo tylko raz, pomija listingi.
+task :spell do
+  $dependencies.each do |file|
+    next unless file =~ /\.tex$/
+    puts "  #{file}  ".center(80, "#")
+    system "sed '/begin{lstlisting}/,/end{lstlisting}/d' #{file} |" +
+      " aspell list -a -t -l pl | aspell list -a | sort | uniq"
+  end
 end
